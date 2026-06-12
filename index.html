@@ -8,96 +8,388 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
+    /* DESIGN.md — ERP Analytics Design System */
     :root {
-      --canvas: #ffffff; --ink: #111111; --charcoal: #39393b; --mute: #707072;
-      --stone: #9e9ea0; --cloud: #f5f5f5; --hairline: #cacacb; --hairline-soft: #e5e5e5;
-      --success: #007d48; --warn: #a66400; --sale: #d30005; --info: #1151ff;
+      --canvas: #ffffff;
+      --ink: #111111;
+      --charcoal: #39393b;
+      --mute: #707072;
+      --stone: #9e9ea0;
+      --cloud: #f5f5f5;
+      --hairline: #cacacb;
+      --hairline-soft: #e5e5e5;
+      --success: #007d48;
+      --warn: #a66400;
+      --sale: #d30005;
+      --info: #1151ff;
     }
+
     *, *::before, *::after { box-sizing: border-box; }
-    body { margin: 0; font-family: "Inter", system-ui, sans-serif; background: var(--canvas); color: var(--ink); letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
-    .display { font-family: "Bebas Neue", system-ui, sans-serif; letter-spacing: 0.01em; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      background: var(--canvas);
+      color: var(--charcoal);
+      letter-spacing: -0.01em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 { color: var(--ink); }
+
+    .display {
+      font-family: "Bebas Neue", system-ui, sans-serif;
+      letter-spacing: 0.02em;
+      font-weight: 400;
+      line-height: 1;
+    }
+
     a { color: inherit; text-decoration: none; }
-    .nk-card { border: 1px solid var(--hairline); background: var(--canvas); border-radius: 0; }
-    .nk-btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; transition: transform 0.15s; }
-    .nk-btn:active { transform: scale(0.95); }
+
+    /* nk-card — 1px border, radius 0 */
+    .nk-card {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      border-radius: 0;
+    }
+
+    /* nk-btn — pill buttons */
+    .nk-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.15s;
+    }
+    .nk-btn:active { transform: scale(0.97); }
     .nk-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .nk-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
     .nk-btn-primary { background: var(--ink); color: #fff; }
-    .nk-btn-primary:hover { background: var(--charcoal); }
+    .nk-btn-primary:hover:not(:disabled) { background: var(--charcoal); }
     .nk-btn-secondary { background: var(--canvas); color: var(--ink); border: 1px solid var(--hairline); }
-    .nk-btn-secondary:hover { background: var(--cloud); }
+    .nk-btn-secondary:hover:not(:disabled) { background: var(--cloud); }
     .nk-btn-success { background: var(--success); color: #fff; }
+    .nk-btn-success:hover:not(:disabled) { background: #006b3d; }
     .nk-btn-sale { background: var(--sale); color: #fff; }
-    header { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--hairline); background: var(--canvas); }
-    .header-inner { max-width: 80rem; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
-    .brand { display: flex; align-items: center; gap: 0.625rem; }
-    .brand-icon { width: 2rem; height: 2rem; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; }
-    .brand-title { font-size: 0.875rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+    .nk-btn-sale:hover:not(:disabled) { background: #b80004; }
+    .nk-btn-info { background: var(--info); color: #fff; }
+    .nk-btn-info:hover:not(:disabled) { background: #0d46d9; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--hairline);
+      background: var(--canvas);
+    }
+    .header-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      background: var(--ink);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Bebas Neue", system-ui, sans-serif;
+      font-size: 1.125rem;
+      letter-spacing: 0.04em;
+      border-radius: 0;
+    }
+    .brand-title {
+      font-family: "Bebas Neue", system-ui, sans-serif;
+      font-size: 1.125rem;
+      letter-spacing: 0.06em;
+      margin: 0;
+      color: var(--ink);
+    }
     .brand-sub { font-size: 0.75rem; color: var(--mute); margin: 0; }
-    nav { display: flex; flex-wrap: wrap; gap: 1.25rem; font-size: 0.875rem; }
-    nav button { background: none; border: none; padding: 0 0 0.25rem; cursor: pointer; color: var(--mute); font: inherit; }
+
+    nav { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 0.875rem; }
+    nav button {
+      background: none;
+      border: none;
+      padding: 0 0 0.35rem;
+      cursor: pointer;
+      color: var(--mute);
+      font: inherit;
+      letter-spacing: -0.01em;
+      transition: color 0.15s;
+    }
     nav button:hover { color: var(--ink); }
-    nav button.active { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--ink); }
-    main { max-width: 80rem; margin: 0 auto; padding: 1.5rem 1.5rem 2.5rem; min-height: calc(100vh - 180px); }
-    footer { border-top: 1px solid var(--hairline); padding: 2rem 1rem; text-align: center; font-size: 0.75rem; color: var(--mute); }
-    .hero { margin-bottom: 2rem; }
-    .hero-tag { font-size: 0.75rem; color: var(--mute); margin: 0 0 0.5rem; }
-    .hero h1 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
-    .hero p { margin: 0.75rem 0 0; max-width: 42rem; font-size: 0.875rem; color: var(--mute); line-height: 1.6; }
+    nav button.active {
+      color: var(--ink);
+      font-weight: 600;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    /* Main — max-width 80rem */
+    main {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+      min-height: calc(100vh - 180px);
+    }
+
+    footer {
+      border-top: 1px solid var(--hairline);
+      padding: 2rem 1rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--mute);
+      letter-spacing: 0.02em;
+    }
+
+    /* Hero */
+    .hero { margin-bottom: 2.5rem; padding-top: 0.5rem; }
+    .hero-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--mute);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 0 0.75rem;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.75rem, 7vw, 4.5rem);
+      color: var(--ink);
+    }
+    .hero p {
+      margin: 1rem 0 0;
+      max-width: 42rem;
+      font-size: 0.875rem;
+      color: var(--mute);
+      line-height: 1.7;
+    }
+
     .page-title { margin-bottom: 1.5rem; }
-    .page-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; }
-    .page-title p { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--mute); }
+    .page-title h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .page-title p { margin: 0.35rem 0 0; font-size: 0.875rem; color: var(--mute); }
+
     .space-y > * + * { margin-top: 1.5rem; }
     .space-y-sm > * + * { margin-top: 1rem; }
     .grid-2 { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
     .grid-4 { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, 1fr); }
     .grid-charts { display: grid; gap: 1rem; }
-    @media (min-width: 1024px) { .grid-charts { grid-template-columns: repeat(2, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 1024px) {
+      .grid-charts { grid-template-columns: repeat(2, 1fr); }
+      .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* 3단계 스텝 카드 */
     .steps { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
     .step-card { padding: 1.25rem; }
-    .step-num { font-size: 1.5rem; font-weight: 700; color: var(--stone); margin: 0 0 0.5rem; }
-    .step-card h4 { margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 700; }
-    .step-card p { margin: 0; font-size: 0.75rem; color: var(--mute); line-height: 1.5; }
-    .text-sm { font-size: 0.875rem; } .text-xs { font-size: 0.75rem; }
-    .text-mute { color: var(--mute); } .text-charcoal { color: var(--charcoal); }
-    .text-stone { color: var(--stone); } .text-success { color: var(--success); } .text-sale { color: var(--sale); }
-    .font-bold { font-weight: 700; } .font-semibold { font-weight: 600; }
+    .step-num {
+      font-size: 2.5rem;
+      color: var(--ink);
+      margin: 0 0 0.75rem;
+    }
+    .step-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+    .step-card p { margin: 0; font-size: 0.75rem; color: var(--mute); line-height: 1.6; }
+
+    .text-sm { font-size: 0.875rem; }
+    .text-xs { font-size: 0.75rem; }
+    .text-lg { font-size: 1.125rem; }
+    .text-mute { color: var(--mute); }
+    .text-charcoal { color: var(--charcoal); }
+    .text-stone { color: var(--stone); }
+    .text-success { color: var(--success); }
+    .text-sale { color: var(--sale); }
+    .text-info { color: var(--info); }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
     .tabular { font-variant-numeric: tabular-nums; }
-    .dropzone { cursor: pointer; border: 2px dashed var(--hairline); background: var(--cloud); padding: 2.5rem 1rem; text-align: center; transition: border-color 0.2s; }
-    .dropzone.dragover { border-color: var(--ink); }
-    .status-card { padding: 1rem; text-align: center; }
+
+    .dropzone {
+      cursor: pointer;
+      border: 2px dashed var(--hairline);
+      background: var(--cloud);
+      padding: 2.75rem 1.5rem;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .dropzone:hover { border-color: var(--charcoal); }
+    .dropzone.dragover { border-color: var(--ink); background: var(--canvas); }
+
+    .status-card {
+      padding: 1.125rem 1rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .status-card.is-uploaded { border-top: 2px solid var(--success); }
+    .status-card .status-icon {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+      color: var(--stone);
+    }
+    .status-card.is-uploaded .status-icon { color: var(--success); }
+
+    .sample-card { padding: 1.25rem; background: var(--cloud); }
+
     .flex-wrap { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
-    .alert-success { border: 1px solid rgba(0,125,72,0.3); background: rgba(0,125,72,0.05); padding: 1rem; }
-    .alert-error { border: 1px solid rgba(211,0,5,0.3); background: rgba(211,0,5,0.05); padding: 1rem; }
+
+    .alert-success {
+      border: 1px solid rgba(0, 125, 72, 0.35);
+      background: rgba(0, 125, 72, 0.05);
+      padding: 1rem 1.25rem;
+    }
+    .alert-error {
+      border: 1px solid rgba(211, 0, 5, 0.35);
+      background: rgba(211, 0, 5, 0.05);
+      padding: 1rem 1.25rem;
+    }
     .error-list { max-height: 15rem; overflow-y: auto; margin: 0.75rem 0 0; padding-left: 1.25rem; }
+
     .section-card { padding: 1.25rem; }
-    .section-card h3 { margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--hairline-soft); font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; }
+    .section-card h3 {
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--hairline-soft);
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+    }
     .section-body { font-size: 0.875rem; line-height: 1.625; color: var(--charcoal); }
-    .kpi-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, 1fr); }
+
+    /* kpi-grid — 2→3→4열 */
+    .kpi-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(2, 1fr);
+    }
     @media (min-width: 640px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (min-width: 1024px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
-    .kpi-item { background: var(--cloud); padding: 0.625rem 0.75rem; }
-    .kpi-item.border-success { border-top: 2px solid var(--success); }
-    .kpi-item.border-warn { border-top: 2px solid var(--warn); }
-    .kpi-item.border-danger { border-top: 2px solid var(--sale); }
-    .kpi-label { font-size: 0.75rem; color: var(--mute); margin: 0; }
-    .kpi-value { font-size: 0.875rem; font-weight: 700; margin: 0; }
-    .chart-card { padding: 1rem; }
-    .chart-card h4 { margin: 0; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; }
-    .chart-card p { margin: 0 0 0.75rem; font-size: 0.75rem; color: var(--mute); }
+
+    .kpi-item {
+      background: var(--cloud);
+      padding: 0.75rem 0.875rem;
+      border-top: 2px solid transparent;
+    }
+    .kpi-item.border-success { border-top-color: var(--success); }
+    .kpi-item.border-warn { border-top-color: var(--warn); }
+    .kpi-item.border-danger { border-top-color: var(--sale); }
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--mute);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .kpi-value {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin: 0.25rem 0 0;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* chart-wrap — height 16rem */
+    .chart-card { padding: 1.25rem; }
+    .chart-card h4 {
+      margin: 0;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+    }
+    .chart-card p { margin: 0.25rem 0 0.75rem; font-size: 0.75rem; color: var(--mute); }
     .chart-wrap { height: 16rem; position: relative; }
+
     .data-table-wrap { overflow-x: auto; border: 1px solid var(--hairline-soft); }
-    table.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
-    table.data-table thead { background: var(--cloud); font-size: 0.75rem; text-transform: uppercase; color: var(--mute); }
-    table.data-table th, table.data-table td { padding: 0.5rem 0.75rem; }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+    table.data-table thead {
+      background: var(--cloud);
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--mute);
+    }
+    table.data-table th, table.data-table td { padding: 0.625rem 0.75rem; }
     table.data-table tbody tr { border-top: 1px solid var(--hairline-soft); color: var(--charcoal); }
-    .empty-state { padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-    .report-hero { background: var(--ink); color: #fff; padding: 2rem; }
-    .report-hero h2 { margin: 0; font-size: 2.25rem; }
-    .report-hero p { margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--stone); }
-    .report-toolbar { padding: 1.25rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
-    .badge { border-radius: 9999px; background: var(--cloud); padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--mute); }
+    table.data-table tbody tr:hover { background: rgba(245, 245, 245, 0.6); }
+
+    .empty-state {
+      padding: 3rem 2rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .report-hero {
+      background: var(--ink);
+      color: #fff;
+      padding: 2.5rem 2rem;
+    }
+    .report-hero h2 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: #fff;
+    }
+    .report-hero p { margin: 0.75rem 0 0; font-size: 0.875rem; color: var(--stone); }
+
+    .report-toolbar {
+      padding: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      border-radius: 9999px;
+      background: var(--cloud);
+      padding: 0.2rem 0.625rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--mute);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--hairline-soft);
+    }
+
     .hidden { display: none !important; }
-    ol.report-list { margin: 0; padding-left: 1.25rem; }
+    ol.report-list { margin: 0; padding-left: 1.25rem; color: var(--charcoal); }
     ol.report-list li + li { margin-top: 0.5rem; }
     .loading { padding: 5rem 1rem; text-align: center; color: var(--stone); }
   </style>
@@ -142,6 +434,11 @@
     const RETURN_STATUSES = new Set(["반품"]);
     const STATUS_COLORS = { "결제완료":"#007d48","배송완료":"#111111","배송중":"#1151ff","주문접수":"#a66400","반품":"#9e9ea0","취소":"#d30005" };
     const PALETTE = ["#111111","#1151ff","#007d48","#0a7281","#7c5cfc","#ed1aa0","#a66400","#9e9ea0","#d30005","#39393b"];
+
+    Chart.defaults.font.family = '"Inter", system-ui, sans-serif';
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = "#707072";
+    Chart.defaults.borderColor = "#e5e5e5";
 
     let state = { view: "upload", uploads: {}, errors: [], validated: false, successMessage: "", dataset: null, analytics: null, report: null, loadingSample: false, generatingPdf: false };
     let chartInstances = [];
@@ -419,7 +716,7 @@
       return renderTable(["상품","카테고리","재고","월평균판매","커버(개월)","상태"], rows.map(r=>`<tr><td>${r.product_name}</td><td>${r.category}</td><td class="tabular">${r.stock_qty}</td><td class="tabular">${r.monthly_avg_sales}</td><td class="tabular">${r.cover_months}</td><td>${r.status}</td></tr>`).join(""));
     }
     function renderEmpty() {
-      return `<div class="nk-card empty-state"><h2 class="text-lg font-bold">아직 불러온 ERP 데이터가 없습니다</h2><p class="text-sm text-mute" style="max-width:28rem">CSV 4종을 업로드하거나 샘플 데이터를 불러온 후 대시보드를 확인하세요.</p><button type="button" class="nk-btn nk-btn-primary" data-action="go-upload">데이터 입력하러 가기</button></div>`;
+      return `<div class="nk-card empty-state"><h2 class="display text-lg">아직 불러온 ERP 데이터가 없습니다</h2><p class="text-sm text-mute" style="max-width:28rem">CSV 4종을 업로드하거나 샘플 데이터를 불러온 후 대시보드를 확인하세요.</p><button type="button" class="nk-btn nk-btn-primary" data-action="go-upload">데이터 입력하러 가기</button></div>`;
     }
 
     function renderUpload() {
@@ -427,25 +724,25 @@
       return `<div class="space-y">
         <section class="hero">
           <p class="hero-tag">ERP 데이터 분석 자동화 · Gemini 보고서</p>
-          <h1>ERP 데이터 분석<br/>대시보드 &amp; 자동 보고서</h1>
+          <h1 class="display">ERP 데이터 분석<br/>대시보드 &amp; 자동 보고서</h1>
           <p>ERP CSV 데이터를 업로드하면 경영 대시보드가 만들어지고, 분석보고서를 작성합니다. KPI·차트를 확인하고 PDF로 다운로드할 수 있습니다.</p>
         </section>
-        <div class="page-title"><h1>ERP 데이터 입력</h1><p>4개의 CSV(상품·고객·주문·주문상세)를 업로드하거나 샘플 데이터를 불러오세요.</p></div>
+        <div class="page-title"><h1 class="display">ERP 데이터 입력</h1><p>4개의 CSV(상품·고객·주문·주문상세)를 업로드하거나 샘플 데이터를 불러오세요.</p></div>
         <div class="nk-card dropzone" id="dropzone">
           <p class="text-sm font-semibold">4개의 ERP CSV 파일을 끌어다 놓거나 클릭하여 업로드</p>
-          <p class="text-xs text-mute" style="margin-top:0.5rem">products.csv · customers.csv · sales_orders.csv · sales_order_items.csv</p>
+          <p class="text-xs text-mute" style="margin-top:0.5rem">products.csv · customers.csv · sales_orders.csv · sales_order_items.csv (한 번에 여러 개 선택 가능)</p>
           <input type="file" id="file-input" accept=".csv" multiple class="hidden" />
         </div>
-        <div class="grid-4">${statuses.map(s=>`<div class="nk-card status-card"><p>${s.uploaded?"✓":"○"}</p><p class="text-sm font-semibold">${s.label}</p><p class="text-xs text-mute">${s.uploaded?s.rowCount+"행":"미업로드"}</p></div>`).join("")}</div>
-        <div class="nk-card" style="padding:1rem;background:var(--cloud)">
+        <div class="grid-4">${statuses.map(s=>`<div class="nk-card status-card${s.uploaded?" is-uploaded":""}"><p class="status-icon">${s.uploaded?"✓":"○"}</p><p class="text-sm font-semibold">${s.label}</p><p class="text-xs text-mute">${s.uploaded?s.rowCount+"행":"미업로드"}</p></div>`).join("")}</div>
+        <div class="nk-card sample-card">
           <p class="text-sm font-semibold">처음이신가요?</p>
           <p class="text-xs text-mute" style="margin-top:0.25rem">내장된 샘플 ERP 데이터를 불러와 바로 체험해 보세요.</p>
           <button type="button" class="nk-btn nk-btn-secondary" style="margin-top:0.75rem" data-action="load-sample" ${state.loadingSample?"disabled":""}>${state.loadingSample?"불러오는 중…":"샘플 데이터 불러오기"}</button>
         </div>
         <div class="steps">
-          <div class="nk-card step-card"><p class="step-num">1</p><h4>데이터 검증</h4><p>4개 테이블 스키마와 참조 무결성을 점검합니다.</p></div>
-          <div class="nk-card step-card"><p class="step-num">2</p><h4>대시보드 생성</h4><p>매출·수익성·고객·재고 KPI와 차트를 시각화합니다.</p></div>
-          <div class="nk-card step-card"><p class="step-num">3</p><h4>보고서 &amp; 다운로드</h4><p>경영 분석 보고서를 생성하고 PDF로 내려받습니다.</p></div>
+          <div class="nk-card step-card"><p class="step-num display">1</p><h3>데이터 검증</h3><p>4개 테이블 스키마와 참조 무결성을 점검합니다.</p></div>
+          <div class="nk-card step-card"><p class="step-num display">2</p><h3>대시보드 생성</h3><p>매출·수익성·고객·재고 KPI와 차트를 시각화합니다.</p></div>
+          <div class="nk-card step-card"><p class="step-num display">3</p><h3>보고서 &amp; 다운로드</h3><p>경영 분석 보고서를 생성하고 PDF로 내려받습니다.</p></div>
         </div>
         <div class="flex-wrap">
           <button type="button" class="nk-btn nk-btn-primary" data-action="validate">데이터 검증</button>
@@ -460,7 +757,7 @@
       if (!state.analytics) return renderEmpty();
       const a = state.analytics;
       return `<div class="space-y">
-        <div class="page-title"><h1>대시보드</h1><p>${a.period.start} ~ ${a.period.end} · ERP 경영 지표 요약</p></div>
+        <div class="page-title"><h1 class="display">대시보드</h1><p>${a.period.start} ~ ${a.period.end} · ERP 경영 지표 요약</p></div>
         <section class="nk-card section-card"><h3>KPI 요약</h3><div class="section-body">${renderKpiGrid(a.kpis,true)}</div></section>
         <div class="grid-charts">
           <div class="nk-card chart-card"><h4>월별 매출 추이</h4><p>매출과 매출총이익</p><div class="chart-wrap"><canvas id="chart-monthly"></canvas></div></div>
@@ -482,9 +779,9 @@
       if (!state.analytics || !state.report) return renderEmpty();
       const a = state.analytics, r = state.report;
       return `<div class="space-y">
-        <div class="page-title"><h1>분석보고서</h1><p>집계 지표를 바탕으로 작성한 경영 분석 보고서입니다.</p></div>
+        <div class="page-title"><h1 class="display">분석보고서</h1><p>집계 지표를 바탕으로 작성한 경영 분석 보고서입니다.</p></div>
         <div class="nk-card report-toolbar">
-          <div><div class="flex-wrap"><h2 class="text-lg font-bold" style="margin:0">ERP 경영 분석 보고서</h2><span class="badge">룰 기반 생성</span></div><p class="text-sm text-mute" style="margin-top:0.25rem">${r.period} · 발행일 ${r.generatedAt}</p></div>
+          <div><div class="flex-wrap"><h2 class="display text-lg" style="margin:0">ERP 경영 분석 보고서</h2><span class="badge">룰 기반 생성</span></div><p class="text-sm text-mute" style="margin-top:0.25rem">${r.period} · 발행일 ${r.generatedAt}</p></div>
           <div class="flex-wrap">
             <button type="button" class="nk-btn nk-btn-secondary" data-action="regenerate-report">보고서 재생성</button>
             <button type="button" class="nk-btn nk-btn-sale" data-action="download-pdf" ${state.generatingPdf?"disabled":""}>${state.generatingPdf?"생성 중…":"PDF 다운로드"}</button>
@@ -513,22 +810,41 @@
     function renderData() {
       if (!state.dataset) return renderEmpty();
       const tables = [{ key:"products", label:"상품" },{ key:"customers", label:"고객" },{ key:"sales_orders", label:"주문" },{ key:"sales_order_items", label:"주문상세" }];
-      return `<div class="space-y"><div class="page-title"><h1>원본 데이터</h1><p>업로드된 테이블 미리보기 (상위 20행)</p></div>
+      return `<div class="space-y"><div class="page-title"><h1 class="display">원본 데이터</h1><p>업로드된 테이블 미리보기 (상위 20행)</p></div>
         ${tables.map(({key,label})=>{ const rows=state.dataset[key], headers=rows.length?Object.keys(rows[0]):[]; const body=rows.slice(0,20).map(row=>`<tr>${headers.map(h=>`<td>${row[h]??""}</td>`).join("")}</tr>`).join(""); return `<section class="nk-card section-card"><h3 style="text-transform:none">${label} · ${rows.length.toLocaleString("ko-KR")}행</h3>${renderTable(headers,body)}</section>`; }).join("")}
       </div>`;
     }
 
     function mountCharts(prefix, a) {
       const p = prefix ? prefix+"-" : "";
-      const barOpts = { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: formatAxis } } } };
+      const gridColor = "#e5e5e5";
+      const barOpts = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { font: { family: '"Inter", system-ui', size: 11 }, color: "#39393b", boxWidth: 12 } } },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: "#707072" } },
+          y: { grid: { color: gridColor }, ticks: { color: "#707072", callback: formatAxis } }
+        }
+      };
       createChart(p+"chart-monthly", { type:"line", data:{ labels:a.monthly.map(d=>d.name), datasets:[{ label:"매출", data:a.monthly.map(d=>d.revenue), borderColor:"#111", backgroundColor:"rgba(17,17,17,0.1)", fill:true, tension:0.3 },{ label:"매출총이익", data:a.monthly.map(d=>d.profit), borderColor:"#007d48", tension:0.3 }] }, options: barOpts });
       createChart(p+"chart-category", { type:"bar", data:{ labels:a.categories.map(d=>d.name), datasets:[{ label:"매출", data:a.categories.map(d=>d.revenue), backgroundColor:"#111" }] }, options: barOpts });
       createChart(p+"chart-channel", { type:"bar", data:{ labels:a.channels.map(d=>d.name), datasets:[{ label:"매출", data:a.channels.map(d=>d.revenue), backgroundColor:"#1151ff" }] }, options: barOpts });
       createChart(p+"chart-tier", { type:"bar", data:{ labels:a.tiers.map(d=>d.name), datasets:[{ label:"매출", data:a.tiers.map(d=>d.revenue), backgroundColor:"#007d48" }] }, options: barOpts });
       if (!prefix) {
-        createChart("chart-payment", { type:"pie", data:{ labels:a.payments.map(d=>d.name), datasets:[{ data:a.payments.map(d=>d.value), backgroundColor:PALETTE }] }, options:{ responsive:true, maintainAspectRatio:false } });
-        createChart("chart-status", { type:"pie", data:{ labels:a.orderStatus.map(d=>d.name), datasets:[{ data:a.orderStatus.map(d=>d.value), backgroundColor:a.orderStatus.map(d=>STATUS_COLORS[d.name]||"#39393b") }] }, options:{ responsive:true, maintainAspectRatio:false } });
-        const hOpts = { indexAxis:"y", responsive:true, maintainAspectRatio:false, scales:{ x:{ ticks:{ callback:formatAxis } } } };
+        const pieOpts = {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom", labels: { font: { family: '"Inter", system-ui', size: 11 }, color: "#39393b", boxWidth: 12, padding: 14 } } }
+        };
+        createChart("chart-payment", { type:"pie", data:{ labels:a.payments.map(d=>d.name), datasets:[{ data:a.payments.map(d=>d.value), backgroundColor:PALETTE, borderWidth:0 }] }, options: pieOpts });
+        createChart("chart-status", { type:"pie", data:{ labels:a.orderStatus.map(d=>d.name), datasets:[{ data:a.orderStatus.map(d=>d.value), backgroundColor:a.orderStatus.map(d=>STATUS_COLORS[d.name]||"#39393b"), borderWidth:0 }] }, options: pieOpts });
+        const hOpts = {
+          indexAxis: "y", responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: gridColor }, ticks: { color: "#707072", callback: formatAxis } },
+            y: { grid: { display: false }, ticks: { color: "#39393b" } }
+          }
+        };
         createChart("chart-brands", { type:"bar", data:{ labels:a.brands.map(d=>d.name), datasets:[{ data:a.brands.map(d=>d.revenue), backgroundColor:"#0a7281" }] }, options:hOpts });
         createChart("chart-regions", { type:"bar", data:{ labels:a.regions.map(d=>d.name), datasets:[{ data:a.regions.map(d=>d.revenue), backgroundColor:"#0a7281" }] }, options:hOpts });
       }
