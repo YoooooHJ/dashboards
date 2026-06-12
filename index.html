@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP 분석 대시보드 &amp; 자동 보고서</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --canvas: #ffffff; --ink: #111111; --charcoal: #39393b; --mute: #707072;
+      --stone: #9e9ea0; --cloud: #f5f5f5; --hairline: #cacacb; --hairline-soft: #e5e5e5;
+      --success: #007d48; --warn: #a66400; --sale: #d30005; --info: #1151ff;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: "Inter", system-ui, sans-serif; background: var(--canvas); color: var(--ink); letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+    .display { font-family: "Bebas Neue", system-ui, sans-serif; letter-spacing: 0.01em; }
+    a { color: inherit; text-decoration: none; }
+    .nk-card { border: 1px solid var(--hairline); background: var(--canvas); border-radius: 0; }
+    .nk-btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; transition: transform 0.15s; }
+    .nk-btn:active { transform: scale(0.95); }
+    .nk-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .nk-btn-primary { background: var(--ink); color: #fff; }
+    .nk-btn-primary:hover { background: var(--charcoal); }
+    .nk-btn-secondary { background: var(--canvas); color: var(--ink); border: 1px solid var(--hairline); }
+    .nk-btn-secondary:hover { background: var(--cloud); }
+    .nk-btn-success { background: var(--success); color: #fff; }
+    .nk-btn-sale { background: var(--sale); color: #fff; }
+    header { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--hairline); background: var(--canvas); }
+    .header-inner { max-width: 80rem; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 0.625rem; }
+    .brand-icon { width: 2rem; height: 2rem; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; }
+    .brand-title { font-size: 0.875rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+    .brand-sub { font-size: 0.75rem; color: var(--mute); margin: 0; }
+    nav { display: flex; flex-wrap: wrap; gap: 1.25rem; font-size: 0.875rem; }
+    nav button { background: none; border: none; padding: 0 0 0.25rem; cursor: pointer; color: var(--mute); font: inherit; }
+    nav button:hover { color: var(--ink); }
+    nav button.active { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--ink); }
+    main { max-width: 80rem; margin: 0 auto; padding: 1.5rem 1.5rem 2.5rem; min-height: calc(100vh - 180px); }
+    footer { border-top: 1px solid var(--hairline); padding: 2rem 1rem; text-align: center; font-size: 0.75rem; color: var(--mute); }
+    .hero { margin-bottom: 2rem; }
+    .hero-tag { font-size: 0.75rem; color: var(--mute); margin: 0 0 0.5rem; }
+    .hero h1 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+    .hero p { margin: 0.75rem 0 0; max-width: 42rem; font-size: 0.875rem; color: var(--mute); line-height: 1.6; }
+    .page-title { margin-bottom: 1.5rem; }
+    .page-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+    .page-title p { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--mute); }
+    .space-y > * + * { margin-top: 1.5rem; }
+    .space-y-sm > * + * { margin-top: 1rem; }
+    .grid-2 { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
+    .grid-4 { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, 1fr); }
+    .grid-charts { display: grid; gap: 1rem; }
+    @media (min-width: 1024px) { .grid-charts { grid-template-columns: repeat(2, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+    .steps { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .step-card { padding: 1.25rem; }
+    .step-num { font-size: 1.5rem; font-weight: 700; color: var(--stone); margin: 0 0 0.5rem; }
+    .step-card h4 { margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 700; }
+    .step-card p { margin: 0; font-size: 0.75rem; color: var(--mute); line-height: 1.5; }
+    .text-sm { font-size: 0.875rem; } .text-xs { font-size: 0.75rem; }
+    .text-mute { color: var(--mute); } .text-charcoal { color: var(--charcoal); }
+    .text-stone { color: var(--stone); } .text-success { color: var(--success); } .text-sale { color: var(--sale); }
+    .font-bold { font-weight: 700; } .font-semibold { font-weight: 600; }
+    .tabular { font-variant-numeric: tabular-nums; }
+    .dropzone { cursor: pointer; border: 2px dashed var(--hairline); background: var(--cloud); padding: 2.5rem 1rem; text-align: center; transition: border-color 0.2s; }
+    .dropzone.dragover { border-color: var(--ink); }
+    .status-card { padding: 1rem; text-align: center; }
+    .flex-wrap { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+    .alert-success { border: 1px solid rgba(0,125,72,0.3); background: rgba(0,125,72,0.05); padding: 1rem; }
+    .alert-error { border: 1px solid rgba(211,0,5,0.3); background: rgba(211,0,5,0.05); padding: 1rem; }
+    .error-list { max-height: 15rem; overflow-y: auto; margin: 0.75rem 0 0; padding-left: 1.25rem; }
+    .section-card { padding: 1.25rem; }
+    .section-card h3 { margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--hairline-soft); font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; }
+    .section-body { font-size: 0.875rem; line-height: 1.625; color: var(--charcoal); }
+    .kpi-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 640px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+    .kpi-item { background: var(--cloud); padding: 0.625rem 0.75rem; }
+    .kpi-item.border-success { border-top: 2px solid var(--success); }
+    .kpi-item.border-warn { border-top: 2px solid var(--warn); }
+    .kpi-item.border-danger { border-top: 2px solid var(--sale); }
+    .kpi-label { font-size: 0.75rem; color: var(--mute); margin: 0; }
+    .kpi-value { font-size: 0.875rem; font-weight: 700; margin: 0; }
+    .chart-card { padding: 1rem; }
+    .chart-card h4 { margin: 0; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; }
+    .chart-card p { margin: 0 0 0.75rem; font-size: 0.75rem; color: var(--mute); }
+    .chart-wrap { height: 16rem; position: relative; }
+    .data-table-wrap { overflow-x: auto; border: 1px solid var(--hairline-soft); }
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
+    table.data-table thead { background: var(--cloud); font-size: 0.75rem; text-transform: uppercase; color: var(--mute); }
+    table.data-table th, table.data-table td { padding: 0.5rem 0.75rem; }
+    table.data-table tbody tr { border-top: 1px solid var(--hairline-soft); color: var(--charcoal); }
+    .empty-state { padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .report-hero { background: var(--ink); color: #fff; padding: 2rem; }
+    .report-hero h2 { margin: 0; font-size: 2.25rem; }
+    .report-hero p { margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--stone); }
+    .report-toolbar { padding: 1.25rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+    .badge { border-radius: 9999px; background: var(--cloud); padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--mute); }
+    .hidden { display: none !important; }
+    ol.report-list { margin: 0; padding-left: 1.25rem; }
+    ol.report-list li + li { margin-top: 0.5rem; }
+    .loading { padding: 5rem 1rem; text-align: center; color: var(--stone); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">E</div>
+        <div>
+          <p class="brand-title">ERP ANALYTICS</p>
+          <p class="brand-sub">업로드 · 분석 · AI 보고서</p>
+        </div>
+      </div>
+      <nav id="main-nav">
+        <button type="button" data-view="upload" class="active">데이터 입력</button>
+        <button type="button" data-view="dashboard">대시보드</button>
+        <button type="button" data-view="report">분석보고서</button>
+        <button type="button" data-view="data">원본 데이터</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app"><p class="loading">불러오는 중…</p></main>
+
+  <footer>ERP DATA ANALYTICS · 분석은 브라우저에서, 보고서 생성은 룰 기반 엔진으로 수행됩니다.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    const TABLE_META = {
+      products: { label: "상품", fileHint: "products", requiredHeaders: ["product_id","product_name","category","brand","unit_cost_krw","unit_price_krw","stock_qty","status"] },
+      customers: { label: "고객", fileHint: "customers", requiredHeaders: ["customer_id","customer_name","customer_type","city","phone","email","join_date","tier"] },
+      sales_orders: { label: "주문", fileHint: "sales_orders", requiredHeaders: ["order_no","customer_id","order_date","status","channel","payment_method","total_amount_krw"] },
+      sales_order_items: { label: "주문상세", fileHint: "sales_order_items", requiredHeaders: ["order_item_id","order_no","product_id","qty","unit_price_krw","discount_pct","amount_krw"] }
+    };
+    const TABLE_KEYS = Object.keys(TABLE_META);
+    const VALID_STATUSES = new Set(["결제완료","배송중","배송완료","주문접수"]);
+    const CANCEL_STATUSES = new Set(["취소"]);
+    const RETURN_STATUSES = new Set(["반품"]);
+    const STATUS_COLORS = { "결제완료":"#007d48","배송완료":"#111111","배송중":"#1151ff","주문접수":"#a66400","반품":"#9e9ea0","취소":"#d30005" };
+    const PALETTE = ["#111111","#1151ff","#007d48","#0a7281","#7c5cfc","#ed1aa0","#a66400","#9e9ea0","#d30005","#39393b"];
+
+    let state = { view: "upload", uploads: {}, errors: [], validated: false, successMessage: "", dataset: null, analytics: null, report: null, loadingSample: false, generatingPdf: false };
+    let chartInstances = [];
+
+    function parseCsvFile(file) {
+      return new Promise((resolve, reject) => {
+        Papa.parse(file, { header: true, skipEmptyLines: true, transformHeader: h => h.trim(),
+          complete: r => r.errors.length ? reject(new Error(r.errors[0].message)) : resolve({ headers: r.meta.fields || [], rows: r.data }),
+          error: reject
+        });
+      });
+    }
+
+    function detectTableKey(fileName, headers) {
+      const n = fileName.toLowerCase();
+      for (const [key, meta] of Object.entries(TABLE_META)) if (n.includes(meta.fileHint)) return key;
+      const set = new Set(headers.map(h => h.trim().toLowerCase()));
+      let best = null;
+      for (const [key, meta] of Object.entries(TABLE_META)) {
+        const score = meta.requiredHeaders.filter(h => set.has(h)).length;
+        if (!best || score > best.score) best = { key, score };
+      }
+      return best && best.score >= 5 ? best.key : null;
+    }
+
+    const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    const num = v => { const n = Number(v); return Number.isFinite(n) ? n : NaN; };
+    const posInt = v => { const n = num(v); return Number.isInteger(n) && n > 0; };
+    const nonNeg = v => { const n = num(v); return Number.isFinite(n) && n >= 0; };
+    const nonEmpty = v => String(v ?? "").trim().length > 0;
+
+    const ROW_VALIDATORS = {
+      products: r => !posInt(r.product_id) ? "product_id" : !nonEmpty(r.product_name) ? "product_name" : !nonEmpty(r.category) ? "category" : !nonEmpty(r.brand) ? "brand" : !nonNeg(r.unit_cost_krw) ? "unit_cost_krw" : !nonNeg(r.unit_price_krw) ? "unit_price_krw" : !Number.isInteger(num(r.stock_qty)) || num(r.stock_qty) < 0 ? "stock_qty" : !nonEmpty(r.status) ? "status" : null,
+      customers: r => !posInt(r.customer_id) ? "customer_id" : !nonEmpty(r.customer_name) ? "customer_name" : !nonEmpty(r.customer_type) ? "customer_type" : !nonEmpty(r.city) ? "city" : !nonEmpty(r.phone) ? "phone" : !isEmail(r.email) ? "email" : !nonEmpty(r.join_date) ? "join_date" : !nonEmpty(r.tier) ? "tier" : null,
+      sales_orders: r => !posInt(r.order_no) ? "order_no" : !posInt(r.customer_id) ? "customer_id" : !nonEmpty(r.order_date) ? "order_date" : !nonEmpty(r.status) ? "status" : !nonEmpty(r.channel) ? "channel" : !nonEmpty(r.payment_method) ? "payment_method" : !nonNeg(r.total_amount_krw) ? "total_amount_krw" : null,
+      sales_order_items: r => !posInt(r.order_item_id) ? "order_item_id" : !posInt(r.order_no) ? "order_no" : !posInt(r.product_id) ? "product_id" : !posInt(r.qty) ? "qty" : !nonNeg(r.unit_price_krw) ? "unit_price_krw" : !Number.isFinite(num(r.discount_pct)) || num(r.discount_pct) < 0 || num(r.discount_pct) > 100 ? "discount_pct" : !nonNeg(r.amount_krw) ? "amount_krw" : null
+    };
+
+    function coerceRow(key, row) {
+      if (key === "products") return { product_id: num(row.product_id), product_name: String(row.product_name).trim(), category: String(row.category).trim(), brand: String(row.brand).trim(), unit_cost_krw: num(row.unit_cost_krw), unit_price_krw: num(row.unit_price_krw), stock_qty: num(row.stock_qty), status: String(row.status).trim() };
+      if (key === "customers") return { customer_id: num(row.customer_id), customer_name: String(row.customer_name).trim(), customer_type: String(row.customer_type).trim(), city: String(row.city).trim(), phone: String(row.phone).trim(), email: String(row.email).trim(), join_date: String(row.join_date).trim(), tier: String(row.tier).trim() };
+      if (key === "sales_orders") return { order_no: num(row.order_no), customer_id: num(row.customer_id), order_date: String(row.order_date).trim(), status: String(row.status).trim(), channel: String(row.channel).trim(), payment_method: String(row.payment_method).trim(), total_amount_krw: num(row.total_amount_krw) };
+      return { order_item_id: num(row.order_item_id), order_no: num(row.order_no), product_id: num(row.product_id), qty: num(row.qty), unit_price_krw: num(row.unit_price_krw), discount_pct: num(row.discount_pct), amount_krw: num(row.amount_krw) };
+    }
+
+    function validateTable(key, fileName, rows, headers) {
+      const meta = TABLE_META[key], errors = [];
+      const set = new Set(headers.map(h => h.trim()));
+      meta.requiredHeaders.forEach(h => { if (!set.has(h)) errors.push({ file: fileName, message: `필수 컬럼 '${h}'이(가) 없습니다.` }); });
+      if (errors.length) return { data: [], errors };
+      if (!rows.length) return { data: [], errors: [{ file: fileName, message: "데이터 행이 없습니다." }] };
+      const data = [];
+      rows.forEach((row, i) => { const f = ROW_VALIDATORS[key](row); if (f) errors.push({ file: fileName, row: i + 2, field: f, message: `${f} 값이 올바르지 않습니다.` }); else data.push(coerceRow(key, row)); });
+      return { data, errors };
+    }
+
+    function validateReferentialIntegrity(dataset) {
+      const errors = [], cIds = new Set(dataset.customers.map(c => c.customer_id)), pIds = new Set(dataset.products.map(p => p.product_id)), oNos = new Set(dataset.sales_orders.map(o => o.order_no));
+      dataset.sales_orders.forEach((o, i) => { if (!cIds.has(o.customer_id)) errors.push({ file: "sales_orders.csv", row: i + 2, field: "customer_id", message: `존재하지 않는 고객 ID: ${o.customer_id}` }); });
+      dataset.sales_order_items.forEach((item, i) => {
+        if (!oNos.has(item.order_no)) errors.push({ file: "sales_order_items.csv", row: i + 2, field: "order_no", message: `존재하지 않는 주문번호: ${item.order_no}` });
+        if (!pIds.has(item.product_id)) errors.push({ file: "sales_order_items.csv", row: i + 2, field: "product_id", message: `존재하지 않는 상품 ID: ${item.product_id}` });
+      });
+      return errors;
+    }
+
+    function validateDataset(partial) {
+      const errors = [];
+      TABLE_KEYS.forEach(key => { if (!partial[key]) errors.push({ file: TABLE_META[key].label, message: `${TABLE_META[key].label} CSV 파일이 업로드되지 않았습니다.` }); });
+      if (errors.length) return { success: false, dataset: null, errors };
+      const dataset = {};
+      TABLE_KEYS.forEach(key => { const r = validateTable(key, partial[key].fileName, partial[key].rows, partial[key].headers); errors.push(...r.errors); if (!r.errors.length) dataset[key] = r.data; });
+      if (errors.length) return { success: false, dataset: null, errors };
+      errors.push(...validateReferentialIntegrity(dataset));
+      return { success: !errors.length, dataset: errors.length ? null : dataset, errors };
+    }
+
+    function formatKrw(v) { return `${Math.round(v).toLocaleString("ko-KR")}원`; }
+    function formatPct(v) { return `${v.toFixed(1)}%`; }
+    function monthKey(d) { const dt = new Date(d); return Number.isNaN(dt.getTime()) ? "unknown" : `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`; }
+    function statusForRate(rate, warn, danger) { return rate >= danger ? "danger" : rate >= warn ? "warn" : "normal"; }
+
+    function computeAnalytics(dataset) {
+      const productMap = new Map(dataset.products.map(p => [p.product_id, p]));
+      const customerMap = new Map(dataset.customers.map(c => [c.customer_id, c]));
+      const validOrders = dataset.sales_orders.filter(o => VALID_STATUSES.has(o.status));
+      const cancelledOrders = dataset.sales_orders.filter(o => CANCEL_STATUSES.has(o.status));
+      const returnedOrders = dataset.sales_orders.filter(o => RETURN_STATUSES.has(o.status));
+      const validOrderNos = new Set(validOrders.map(o => o.order_no));
+      const validItems = dataset.sales_order_items.filter(i => validOrderNos.has(i.order_no));
+      let revenue = 0, cogs = 0, totalQty = 0;
+      const monthlyMap = new Map(), categoryMap = new Map(), channelMap = new Map(), tierMap = new Map();
+      const paymentMap = new Map(), statusMap = new Map(), brandMap = new Map(), regionMap = new Map();
+      const productRevenue = new Map(), customerRevenue = new Map(), productMonthlySales = new Map();
+      const orderDateMap = new Map(dataset.sales_orders.map(o => [o.order_no, o.order_date]));
+
+      dataset.sales_orders.forEach(o => {
+        statusMap.set(o.status, (statusMap.get(o.status) ?? 0) + o.total_amount_krw);
+        if (!VALID_STATUSES.has(o.status)) return;
+        channelMap.set(o.channel, (channelMap.get(o.channel) ?? 0) + o.total_amount_krw);
+        paymentMap.set(o.payment_method, (paymentMap.get(o.payment_method) ?? 0) + o.total_amount_krw);
+      });
+
+      validItems.forEach(item => {
+        const amount = item.amount_krw, product = productMap.get(item.product_id);
+        const cost = (product?.unit_cost_krw ?? 0) * item.qty, profit = amount - cost;
+        revenue += amount; cogs += cost; totalQty += item.qty;
+        const mk = monthKey(orderDateMap.get(item.order_no) ?? "");
+        const m = monthlyMap.get(mk) ?? { revenue: 0, profit: 0 }; m.revenue += amount; m.profit += profit; monthlyMap.set(mk, m);
+        if (product) {
+          categoryMap.set(product.category, (categoryMap.get(product.category) ?? 0) + amount);
+          brandMap.set(product.brand, (brandMap.get(product.brand) ?? 0) + amount);
+          const pr = productRevenue.get(product.product_id) ?? { revenue: 0, qty: 0, cost: 0 };
+          pr.revenue += amount; pr.qty += item.qty; pr.cost += cost; productRevenue.set(product.product_id, pr);
+          const sales = productMonthlySales.get(product.product_id) ?? []; sales.push(item.qty); productMonthlySales.set(product.product_id, sales);
+        }
+        const order = dataset.sales_orders.find(o => o.order_no === item.order_no);
+        if (order) {
+          const customer = customerMap.get(order.customer_id);
+          if (customer) {
+            tierMap.set(customer.tier, (tierMap.get(customer.tier) ?? 0) + amount);
+            regionMap.set(customer.city, (regionMap.get(customer.city) ?? 0) + amount);
+            const cr = customerRevenue.get(customer.customer_id) ?? { revenue: 0, orders: new Set() };
+            cr.revenue += amount; cr.orders.add(order.order_no); customerRevenue.set(customer.customer_id, cr);
+          }
+        }
+      });
+
+      const grossProfit = revenue - cogs, marginPct = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
+      const validOrderCount = validOrders.length, avgOrderValue = validOrderCount > 0 ? revenue / validOrderCount : 0;
+      const totalOrders = dataset.sales_orders.length;
+      const cancelRate = totalOrders > 0 ? (cancelledOrders.length / totalOrders) * 100 : 0;
+      const returnRate = totalOrders > 0 ? (returnedOrders.length / totalOrders) * 100 : 0;
+      const activeCustomerIds = new Set(validOrders.map(o => o.customer_id));
+      const discontinuedCount = dataset.products.filter(p => p.status === "단종").length;
+
+      const stockRisks = dataset.products.map(product => {
+        const sales = productMonthlySales.get(product.product_id) ?? [];
+        const months = new Set(validItems.filter(i => i.product_id === product.product_id).map(i => monthKey(orderDateMap.get(i.order_no) ?? "")));
+        const monthlyAvg = sales.length > 0 ? sales.reduce((a,b) => a+b, 0) / Math.max(1, months.size) : 0;
+        const cover = monthlyAvg > 0 ? product.stock_qty / monthlyAvg : 999;
+        let status = "정상";
+        if (product.stock_qty === 0 || cover < 1) status = "품절위험";
+        else if (cover < 2) status = "재고부족";
+        else if (cover > 12) status = "과잉재고";
+        return { product_name: product.product_name, category: product.category, stock_qty: product.stock_qty, monthly_avg_sales: Math.round(monthlyAvg*10)/10, cover_months: Math.round(cover*10)/10, status };
+      }).filter(r => r.status !== "정상").sort((a,b) => a.cover_months - b.cover_months).slice(0, 20);
+
+      const dates = validOrders.map(o => new Date(o.order_date)).filter(d => !Number.isNaN(d.getTime())).sort((a,b) => a - b);
+      const period = { start: dates[0]?.toISOString().slice(0,10) ?? "-", end: dates[dates.length-1]?.toISOString().slice(0,10) ?? "-" };
+
+      const kpis = [
+        { key:"revenue", label:"유효매출", value: formatKrw(revenue) },
+        { key:"cogs", label:"매출원가", value: formatKrw(cogs) },
+        { key:"grossProfit", label:"매출총이익", value: formatKrw(grossProfit) },
+        { key:"margin", label:"매출총이익률", value: formatPct(marginPct), status: statusForRate(100-marginPct, 70, 85) },
+        { key:"aov", label:"평균 주문금액", value: formatKrw(avgOrderValue) },
+        { key:"orders", label:"유효 주문수", value: `${validOrderCount.toLocaleString("ko-KR")}건` },
+        { key:"cancel", label:"취소율", value: formatPct(cancelRate), status: statusForRate(cancelRate, 5, 10) },
+        { key:"return", label:"반품율", value: formatPct(returnRate), status: statusForRate(returnRate, 3, 7) },
+        { key:"customers", label:"활성 고객수", value: `${activeCustomerIds.size.toLocaleString("ko-KR")}명` },
+        { key:"stockRisk", label:"재고 위험", value: `${stockRisks.length.toLocaleString("ko-KR")}건`, status: stockRisks.length > 10 ? "danger" : stockRisks.length > 5 ? "warn" : "normal" },
+        { key:"discontinued", label:"단종 상품", value: `${discontinuedCount.toLocaleString("ko-KR")}건` },
+        { key:"qty", label:"판매 수량", value: `${totalQty.toLocaleString("ko-KR")}개` }
+      ];
+
+      const toChart = map => [...map.entries()].map(([name,value]) => ({ name, value, revenue: value })).sort((a,b) => b.value - a.value);
+      const topProducts = [...productRevenue.entries()].map(([id, s]) => {
+        const p = productMap.get(id);
+        return { rank: 0, product_name: p.product_name, category: p.category, revenue: s.revenue, qty: s.qty, margin_pct: s.revenue > 0 ? ((s.revenue-s.cost)/s.revenue)*100 : 0 };
+      }).sort((a,b) => b.revenue - a.revenue).slice(0,10).map((item,i) => ({ ...item, rank: i+1 }));
+
+      const topCustomers = [...customerRevenue.entries()].map(([id, s]) => {
+        const c = customerMap.get(id);
+        return { rank: 0, customer_name: c.customer_name, tier: c.tier, city: c.city, revenue: s.revenue, order_count: s.orders.size };
+      }).sort((a,b) => b.revenue - a.revenue).slice(0,10).map((item,i) => ({ ...item, rank: i+1 }));
+
+      return {
+        period, kpis,
+        monthly: [...monthlyMap.entries()].sort(([a],[b]) => a.localeCompare(b)).map(([name,v]) => ({ name, revenue: v.revenue, profit: v.profit })),
+        categories: toChart(categoryMap), channels: toChart(channelMap), tiers: toChart(tierMap),
+        payments: toChart(paymentMap), orderStatus: toChart(statusMap),
+        brands: toChart(brandMap).slice(0,10), regions: toChart(regionMap).slice(0,10),
+        topProducts, topCustomers, stockRisks
+      };
+    }
+
+    function generateReport(analytics) {
+      const kpi = Object.fromEntries(analytics.kpis.map(k => [k.key, k.value]));
+      const topCategory = analytics.categories[0]?.name ?? "-", topChannel = analytics.channels[0]?.name ?? "-", topTier = analytics.tiers[0]?.name ?? "-";
+      return {
+        title: "ERP 경영 분석 보고서",
+        period: `${analytics.period.start} ~ ${analytics.period.end}`,
+        generatedAt: new Date().toISOString().slice(0,10),
+        summary: `분석 기간 ${analytics.period.start} ~ ${analytics.period.end} 동안 유효매출 ${kpi.revenue}, 매출총이익 ${kpi.grossProfit}(이익률 ${kpi.margin}). 유효 주문 ${kpi.orders}, 활성 고객 ${kpi.customers}.`,
+        sections: [
+          { title: "2. 매출 분석", content: `'${topCategory}' 카테고리와 '${topChannel}' 채널이 핵심 매출원입니다.` },
+          { title: "3. 수익성 분석", content: `매출총이익률 ${kpi.margin}로 수익성을 모니터링하세요.` },
+          { title: "4. 고객 분석", content: `'${topTier}' 등급 고객의 매출 기여도가 높습니다.` },
+          { title: "5. 상품·재고 분석", content: `재고 위험 ${kpi.stockRisk}, 단종 ${kpi.discontinued}건입니다.` },
+          { title: "6. 채널·결제 분석", content: `채널별·결제수단별 매출 분포를 점검하세요.` },
+          { title: "7. 리스크 분석", content: `취소율 ${kpi.cancel}, 반품율 ${kpi.return}이 주요 리스크입니다.` }
+        ],
+        recommendations: [
+          `'${topCategory}' 중심 재고·프로모션 전략 수립`,
+          `'${topChannel}' 채널 전환율 개선`,
+          `VIP 고객 리텐션 프로그램 강화`,
+          `재고 위험 상품 발주·할인 정책 검토`,
+          `취소·반품 패턴 CS 프로세스 개선`
+        ]
+      };
+    }
+
+    function applyValidation(result) {
+      state.errors = result.errors; state.validated = result.success;
+      state.successMessage = result.success ? `데이터 검증 성공 · 상품 ${result.dataset.products.length}행 · 고객 ${result.dataset.customers.length}행 · 주문 ${result.dataset.sales_orders.length}행 · 주문상세 ${result.dataset.sales_order_items.length}행` : "";
+      if (result.success && result.dataset) { state.dataset = result.dataset; state.analytics = computeAnalytics(result.dataset); state.report = generateReport(state.analytics); }
+    }
+
+    async function processFiles(files) {
+      const next = { ...state.uploads }, localErrors = [];
+      const remaining = Math.max(0, 4 - Object.keys(next).length);
+      const toProcess = Array.from(files).slice(0, remaining);
+      if (Array.from(files).length > remaining) localErrors.push({ file: "upload", message: "CSV 파일은 최대 4건까지만 업로드할 수 있습니다." });
+      for (const file of toProcess) {
+        try {
+          const { headers, rows } = await parseCsvFile(file);
+          const key = detectTableKey(file.name, headers);
+          if (!key) { localErrors.push({ file: file.name, message: "파일 형식을 인식할 수 없습니다." }); continue; }
+          if (next[key]) { localErrors.push({ file: file.name, message: `${TABLE_META[key].label} 파일이 이미 업로드되었습니다.` }); continue; }
+          next[key] = { fileName: file.name, headers, rows };
+        } catch (err) { localErrors.push({ file: file.name, message: err.message || "CSV 파싱 오류" }); }
+      }
+      state.uploads = next; state.validated = false; state.successMessage = ""; state.errors = localErrors; render();
+    }
+
+    async function loadSample() {
+      state.loadingSample = true; state.errors = []; render();
+      const next = {}, files = [
+        { key: "products", file: "products.csv" }, { key: "customers", file: "customers.csv" },
+        { key: "sales_orders", file: "sales_orders.csv" }, { key: "sales_order_items", file: "sales_order_items.csv" }
+      ];
+      try {
+        for (const { key, file } of files) {
+          const res = await fetch(file);
+          if (!res.ok) throw new Error(`${file}을 불러올 수 없습니다. 웹 서버에서 실행해주세요.`);
+          const text = await res.text();
+          const parsed = await parseCsvFile(new File([text], file, { type: "text/csv" }));
+          next[key] = { fileName: file, ...parsed };
+        }
+        state.uploads = next;
+        applyValidation(validateDataset(next));
+      } catch (err) { state.errors = [{ file: "sample", message: err.message }]; state.validated = false; }
+      finally { state.loadingSample = false; render(); }
+    }
+
+    function destroyCharts() { chartInstances.forEach(c => c.destroy()); chartInstances = []; }
+    function formatAxis(v) { if (v >= 1e9) return (v/1e9).toFixed(1)+"B"; if (v >= 1e6) return (v/1e6).toFixed(0)+"M"; if (v >= 1e3) return (v/1e3).toFixed(0)+"K"; return String(v); }
+    function createChart(id, config) { const el = document.getElementById(id); if (!el) return; chartInstances.push(new Chart(el, config)); }
+
+    function renderKpiGrid(kpis, withStatus) {
+      return `<div class="kpi-grid">${kpis.map(k => `<div class="kpi-item ${withStatus && k.status ? "border-"+k.status : ""}"><p class="kpi-label">${k.label}</p><p class="kpi-value tabular">${k.value}</p></div>`).join("")}</div>`;
+    }
+    function renderTable(headers, body) {
+      return `<div class="data-table-wrap"><table class="data-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
+    }
+    function renderTopProducts(rows) {
+      return renderTable(["#","상품","카테고리","매출","수량","이익률"], rows.map(r=>`<tr><td>${r.rank}</td><td>${r.product_name}</td><td>${r.category}</td><td class="tabular">${r.revenue.toLocaleString("ko-KR")}</td><td class="tabular">${r.qty.toLocaleString("ko-KR")}</td><td class="tabular">${r.margin_pct.toFixed(1)}%</td></tr>`).join(""));
+    }
+    function renderTopCustomers(rows) {
+      return renderTable(["#","고객","등급","지역","매출","주문수"], rows.map(r=>`<tr><td>${r.rank}</td><td>${r.customer_name}</td><td>${r.tier}</td><td>${r.city}</td><td class="tabular">${r.revenue.toLocaleString("ko-KR")}</td><td class="tabular">${r.order_count}</td></tr>`).join(""));
+    }
+    function renderStockRisks(rows) {
+      if (!rows.length) return `<p class="text-sm text-mute">재고 위험 상품이 없습니다.</p>`;
+      return renderTable(["상품","카테고리","재고","월평균판매","커버(개월)","상태"], rows.map(r=>`<tr><td>${r.product_name}</td><td>${r.category}</td><td class="tabular">${r.stock_qty}</td><td class="tabular">${r.monthly_avg_sales}</td><td class="tabular">${r.cover_months}</td><td>${r.status}</td></tr>`).join(""));
+    }
+    function renderEmpty() {
+      return `<div class="nk-card empty-state"><h2 class="text-lg font-bold">아직 불러온 ERP 데이터가 없습니다</h2><p class="text-sm text-mute" style="max-width:28rem">CSV 4종을 업로드하거나 샘플 데이터를 불러온 후 대시보드를 확인하세요.</p><button type="button" class="nk-btn nk-btn-primary" data-action="go-upload">데이터 입력하러 가기</button></div>`;
+    }
+
+    function renderUpload() {
+      const statuses = TABLE_KEYS.map(key => ({ label: TABLE_META[key].label, uploaded: !!state.uploads[key], rowCount: state.uploads[key]?.rows.length ?? 0 }));
+      return `<div class="space-y">
+        <section class="hero">
+          <p class="hero-tag">ERP 데이터 분석 자동화 · Gemini 보고서</p>
+          <h1>ERP 데이터 분석<br/>대시보드 &amp; 자동 보고서</h1>
+          <p>ERP CSV 데이터를 업로드하면 경영 대시보드가 만들어지고, 분석보고서를 작성합니다. KPI·차트를 확인하고 PDF로 다운로드할 수 있습니다.</p>
+        </section>
+        <div class="page-title"><h1>ERP 데이터 입력</h1><p>4개의 CSV(상품·고객·주문·주문상세)를 업로드하거나 샘플 데이터를 불러오세요.</p></div>
+        <div class="nk-card dropzone" id="dropzone">
+          <p class="text-sm font-semibold">4개의 ERP CSV 파일을 끌어다 놓거나 클릭하여 업로드</p>
+          <p class="text-xs text-mute" style="margin-top:0.5rem">products.csv · customers.csv · sales_orders.csv · sales_order_items.csv</p>
+          <input type="file" id="file-input" accept=".csv" multiple class="hidden" />
+        </div>
+        <div class="grid-4">${statuses.map(s=>`<div class="nk-card status-card"><p>${s.uploaded?"✓":"○"}</p><p class="text-sm font-semibold">${s.label}</p><p class="text-xs text-mute">${s.uploaded?s.rowCount+"행":"미업로드"}</p></div>`).join("")}</div>
+        <div class="nk-card" style="padding:1rem;background:var(--cloud)">
+          <p class="text-sm font-semibold">처음이신가요?</p>
+          <p class="text-xs text-mute" style="margin-top:0.25rem">내장된 샘플 ERP 데이터를 불러와 바로 체험해 보세요.</p>
+          <button type="button" class="nk-btn nk-btn-secondary" style="margin-top:0.75rem" data-action="load-sample" ${state.loadingSample?"disabled":""}>${state.loadingSample?"불러오는 중…":"샘플 데이터 불러오기"}</button>
+        </div>
+        <div class="steps">
+          <div class="nk-card step-card"><p class="step-num">1</p><h4>데이터 검증</h4><p>4개 테이블 스키마와 참조 무결성을 점검합니다.</p></div>
+          <div class="nk-card step-card"><p class="step-num">2</p><h4>대시보드 생성</h4><p>매출·수익성·고객·재고 KPI와 차트를 시각화합니다.</p></div>
+          <div class="nk-card step-card"><p class="step-num">3</p><h4>보고서 &amp; 다운로드</h4><p>경영 분석 보고서를 생성하고 PDF로 내려받습니다.</p></div>
+        </div>
+        <div class="flex-wrap">
+          <button type="button" class="nk-btn nk-btn-primary" data-action="validate">데이터 검증</button>
+          ${state.validated?`<button type="button" class="nk-btn nk-btn-success" data-action="go-dashboard">대시보드로 이동 →</button>`:""}
+        </div>
+        ${state.validated&&state.successMessage?`<div class="nk-card alert-success"><p class="text-sm font-bold text-success">데이터 검증 성공</p><p class="text-sm text-charcoal" style="margin-top:0.5rem">${state.successMessage}</p></div>`:""}
+        ${state.errors.length&&!state.validated?`<div class="nk-card alert-error"><p class="text-sm font-bold text-sale">데이터 검증 실패 (${state.errors.length}건)</p><ul class="error-list text-sm text-charcoal">${state.errors.map(e=>`<li>[${e.file}${e.row?" · "+e.row+"행":""}${e.field?" · "+e.field:""}] ${e.message}</li>`).join("")}</ul></div>`:""}
+      </div>`;
+    }
+
+    function renderDashboard() {
+      if (!state.analytics) return renderEmpty();
+      const a = state.analytics;
+      return `<div class="space-y">
+        <div class="page-title"><h1>대시보드</h1><p>${a.period.start} ~ ${a.period.end} · ERP 경영 지표 요약</p></div>
+        <section class="nk-card section-card"><h3>KPI 요약</h3><div class="section-body">${renderKpiGrid(a.kpis,true)}</div></section>
+        <div class="grid-charts">
+          <div class="nk-card chart-card"><h4>월별 매출 추이</h4><p>매출과 매출총이익</p><div class="chart-wrap"><canvas id="chart-monthly"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>카테고리별 매출</h4><p>상품 카테고리 기준</p><div class="chart-wrap"><canvas id="chart-category"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>채널별 매출</h4><p>판매 채널 기준</p><div class="chart-wrap"><canvas id="chart-channel"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>고객 등급별 매출</h4><p>VIP / 일반 / 휴면</p><div class="chart-wrap"><canvas id="chart-tier"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>결제수단별 매출</h4><div class="chart-wrap"><canvas id="chart-payment"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>주문 상태 분포</h4><div class="chart-wrap"><canvas id="chart-status"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>브랜드별 매출 TOP</h4><div class="chart-wrap"><canvas id="chart-brands"></canvas></div></div>
+          <div class="nk-card chart-card"><h4>지역별 매출 TOP</h4><div class="chart-wrap"><canvas id="chart-regions"></canvas></div></div>
+        </div>
+        <section class="nk-card section-card"><h3>상위 상품 (매출 TOP 10)</h3><div class="section-body">${renderTopProducts(a.topProducts)}</div></section>
+        <section class="nk-card section-card"><h3>상위 고객 (매출 TOP 10)</h3><div class="section-body">${renderTopCustomers(a.topCustomers)}</div></section>
+        <section class="nk-card section-card"><h3>재고 위험 상세</h3><div class="section-body">${renderStockRisks(a.stockRisks)}</div></section>
+      </div>`;
+    }
+
+    function renderReport() {
+      if (!state.analytics || !state.report) return renderEmpty();
+      const a = state.analytics, r = state.report;
+      return `<div class="space-y">
+        <div class="page-title"><h1>분석보고서</h1><p>집계 지표를 바탕으로 작성한 경영 분석 보고서입니다.</p></div>
+        <div class="nk-card report-toolbar">
+          <div><div class="flex-wrap"><h2 class="text-lg font-bold" style="margin:0">ERP 경영 분석 보고서</h2><span class="badge">룰 기반 생성</span></div><p class="text-sm text-mute" style="margin-top:0.25rem">${r.period} · 발행일 ${r.generatedAt}</p></div>
+          <div class="flex-wrap">
+            <button type="button" class="nk-btn nk-btn-secondary" data-action="regenerate-report">보고서 재생성</button>
+            <button type="button" class="nk-btn nk-btn-sale" data-action="download-pdf" ${state.generatingPdf?"disabled":""}>${state.generatingPdf?"생성 중…":"PDF 다운로드"}</button>
+            <button type="button" class="nk-btn nk-btn-primary" data-action="go-dashboard">대시보드 보기</button>
+          </div>
+        </div>
+        <div id="report-document" class="space-y-sm">
+          <div class="report-hero"><h2 class="display">${r.title.toUpperCase()}</h2><p>분석 기간 ${r.period}</p></div>
+          <section class="nk-card section-card"><h3>KPI 요약</h3><div class="section-body">${renderKpiGrid(a.kpis,false)}</div></section>
+          <section class="nk-card section-card"><h3>1. Executive Summary</h3><div class="section-body"><p>${r.summary}</p></div></section>
+          <section class="nk-card section-card"><h3>주요 차트</h3><div class="section-body grid-charts">
+            <div class="nk-card chart-card"><h4>월별 매출</h4><div class="chart-wrap"><canvas id="r-chart-monthly"></canvas></div></div>
+            <div class="nk-card chart-card"><h4>카테고리별</h4><div class="chart-wrap"><canvas id="r-chart-category"></canvas></div></div>
+            <div class="nk-card chart-card"><h4>채널별</h4><div class="chart-wrap"><canvas id="r-chart-channel"></canvas></div></div>
+            <div class="nk-card chart-card"><h4>등급별</h4><div class="chart-wrap"><canvas id="r-chart-tier"></canvas></div></div>
+          </div></section>
+          ${r.sections.map(s=>`<section class="nk-card section-card"><h3>${s.title}</h3><div class="section-body"><p>${s.content}</p></div></section>`).join("")}
+          <section class="nk-card section-card"><h3>8. 추천 액션</h3><div class="section-body"><ol class="report-list">${r.recommendations.map(i=>`<li>${i}</li>`).join("")}</ol></div></section>
+          <section class="nk-card section-card"><h3>상위 상품 TOP 10</h3><div class="section-body">${renderTopProducts(a.topProducts)}</div></section>
+          <section class="nk-card section-card"><h3>상위 고객 TOP 10</h3><div class="section-body">${renderTopCustomers(a.topCustomers)}</div></section>
+          <section class="nk-card section-card"><h3>재고 위험 상세</h3><div class="section-body">${renderStockRisks(a.stockRisks)}</div></section>
+        </div>
+      </div>`;
+    }
+
+    function renderData() {
+      if (!state.dataset) return renderEmpty();
+      const tables = [{ key:"products", label:"상품" },{ key:"customers", label:"고객" },{ key:"sales_orders", label:"주문" },{ key:"sales_order_items", label:"주문상세" }];
+      return `<div class="space-y"><div class="page-title"><h1>원본 데이터</h1><p>업로드된 테이블 미리보기 (상위 20행)</p></div>
+        ${tables.map(({key,label})=>{ const rows=state.dataset[key], headers=rows.length?Object.keys(rows[0]):[]; const body=rows.slice(0,20).map(row=>`<tr>${headers.map(h=>`<td>${row[h]??""}</td>`).join("")}</tr>`).join(""); return `<section class="nk-card section-card"><h3 style="text-transform:none">${label} · ${rows.length.toLocaleString("ko-KR")}행</h3>${renderTable(headers,body)}</section>`; }).join("")}
+      </div>`;
+    }
+
+    function mountCharts(prefix, a) {
+      const p = prefix ? prefix+"-" : "";
+      const barOpts = { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: formatAxis } } } };
+      createChart(p+"chart-monthly", { type:"line", data:{ labels:a.monthly.map(d=>d.name), datasets:[{ label:"매출", data:a.monthly.map(d=>d.revenue), borderColor:"#111", backgroundColor:"rgba(17,17,17,0.1)", fill:true, tension:0.3 },{ label:"매출총이익", data:a.monthly.map(d=>d.profit), borderColor:"#007d48", tension:0.3 }] }, options: barOpts });
+      createChart(p+"chart-category", { type:"bar", data:{ labels:a.categories.map(d=>d.name), datasets:[{ label:"매출", data:a.categories.map(d=>d.revenue), backgroundColor:"#111" }] }, options: barOpts });
+      createChart(p+"chart-channel", { type:"bar", data:{ labels:a.channels.map(d=>d.name), datasets:[{ label:"매출", data:a.channels.map(d=>d.revenue), backgroundColor:"#1151ff" }] }, options: barOpts });
+      createChart(p+"chart-tier", { type:"bar", data:{ labels:a.tiers.map(d=>d.name), datasets:[{ label:"매출", data:a.tiers.map(d=>d.revenue), backgroundColor:"#007d48" }] }, options: barOpts });
+      if (!prefix) {
+        createChart("chart-payment", { type:"pie", data:{ labels:a.payments.map(d=>d.name), datasets:[{ data:a.payments.map(d=>d.value), backgroundColor:PALETTE }] }, options:{ responsive:true, maintainAspectRatio:false } });
+        createChart("chart-status", { type:"pie", data:{ labels:a.orderStatus.map(d=>d.name), datasets:[{ data:a.orderStatus.map(d=>d.value), backgroundColor:a.orderStatus.map(d=>STATUS_COLORS[d.name]||"#39393b") }] }, options:{ responsive:true, maintainAspectRatio:false } });
+        const hOpts = { indexAxis:"y", responsive:true, maintainAspectRatio:false, scales:{ x:{ ticks:{ callback:formatAxis } } } };
+        createChart("chart-brands", { type:"bar", data:{ labels:a.brands.map(d=>d.name), datasets:[{ data:a.brands.map(d=>d.revenue), backgroundColor:"#0a7281" }] }, options:hOpts });
+        createChart("chart-regions", { type:"bar", data:{ labels:a.regions.map(d=>d.name), datasets:[{ data:a.regions.map(d=>d.revenue), backgroundColor:"#0a7281" }] }, options:hOpts });
+      }
+    }
+
+    async function downloadPdf() {
+      const el = document.getElementById("report-document");
+      if (!el) return;
+      state.generatingPdf = true; render();
+      try {
+        const canvas = await html2canvas(el, { scale:2, useCORS:true, backgroundColor:"#fff" });
+        const img = canvas.toDataURL("image/png"), { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p","mm","a4"), pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+        const iw = pw, ih = (canvas.height*iw)/canvas.width;
+        let left = ih, pos = 0;
+        pdf.addImage(img,"PNG",0,pos,iw,ih); left -= ph;
+        while (left > 0) { pos = left - ih; pdf.addPage(); pdf.addImage(img,"PNG",0,pos,iw,ih); left -= ph; }
+        pdf.save(`ERP_Analysis_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+      } catch { alert("PDF 생성에 실패했습니다."); }
+      finally { state.generatingPdf = false; render(); }
+    }
+
+    function setView(view) { state.view = view; document.querySelectorAll("#main-nav button").forEach(b => b.classList.toggle("active", b.dataset.view === view)); render(); }
+
+    function bindEvents() {
+      document.querySelectorAll("#main-nav button").forEach(b => b.onclick = () => setView(b.dataset.view));
+      const dz = document.getElementById("dropzone"), fi = document.getElementById("file-input");
+      if (dz && fi) {
+        dz.onclick = () => fi.click();
+        dz.ondragover = e => { e.preventDefault(); dz.classList.add("dragover"); };
+        dz.ondragleave = () => dz.classList.remove("dragover");
+        dz.ondrop = e => { e.preventDefault(); dz.classList.remove("dragover"); if (e.dataTransfer.files.length) processFiles(e.dataTransfer.files); };
+        fi.onchange = e => { if (e.target.files.length) processFiles(e.target.files); e.target.value = ""; };
+      }
+      document.querySelectorAll("[data-action]").forEach(el => {
+        el.onclick = () => {
+          const a = el.dataset.action;
+          if (a === "validate") { applyValidation(validateDataset(state.uploads)); render(); }
+          if (a === "load-sample") loadSample();
+          if (a === "go-dashboard") setView("dashboard");
+          if (a === "go-upload") setView("upload");
+          if (a === "regenerate-report") { state.report = generateReport(state.analytics); render(); }
+          if (a === "download-pdf") downloadPdf();
+        };
+      });
+    }
+
+    function render() {
+      destroyCharts();
+      const views = { upload: renderUpload, dashboard: renderDashboard, report: renderReport, data: renderData };
+      document.getElementById("app").innerHTML = views[state.view]();
+      bindEvents();
+      if (state.analytics) {
+        if (state.view === "dashboard") mountCharts("", state.analytics);
+        if (state.view === "report") mountCharts("r", state.analytics);
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
